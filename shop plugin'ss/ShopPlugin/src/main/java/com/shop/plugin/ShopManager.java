@@ -37,8 +37,8 @@ public class ShopManager {
     private void registerItems() {
         items.add(new ShopItem("Wool x64",                          35,  64,  8));
         items.add(new ShopItem("Golden Axe Tree-Chopper (1 hour)", -1,   1, 32));
-        items.add(new ShopItem("Steak x16",                   364, 6, 2));
-        items.add(new ShopItem("TNT x16",             46,  64, 24));
+        items.add(new ShopItem("Porkchop x6",                   320, 6, 2));
+        items.add(new ShopItem("TNT x64",             46,  64, 24));
     }
 
     // ------------------------------------------------------------------
@@ -178,7 +178,7 @@ public class ShopManager {
         int             remaining = quantity;
 
         while (remaining > 0) {
-            int stackSize = Math.min(remaining, 64);
+            int stackSize = Math.min(remaining, getMaxStackSize(itemId));
             java.util.Map<Integer, ItemStack> leftover =
                 inv.addItem(new ItemStack(itemId, stackSize));
             if (!leftover.isEmpty()) {
@@ -214,8 +214,8 @@ public class ShopManager {
         case 314: case 315: case 316: case 317:
         // Food (non-stackable in Beta 1.7.3)
         case 319: case 320: case 349: case 350:
-        case 357: case 360: case 363: case 364:
-        case 365: case 366: case 367: case 373:
+        case 260: case 297: case 322:
+            return 1;
         // Buckets, boats, minecarts, doors, signs
         case 325: case 326: case 327:
         case 328: case 333: case 342: case 343:
