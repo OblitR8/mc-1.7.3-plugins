@@ -36,7 +36,7 @@ public class ShopManager {
 
     private void registerItems() {
         items.add(new ShopItem("Wool x64",                          35,  64,  8));
-        items.add(new ShopItem("Golden Axe Tree-Chopper (1 hour)", -1,   1, 16));
+        items.add(new ShopItem("Golden Axe Tree-Chopper (1 hour)", -1,   1, 32));
     }
 
     // ------------------------------------------------------------------
