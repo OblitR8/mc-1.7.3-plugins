@@ -4,12 +4,18 @@
 # Server rules displayed by /rules
 # Add, remove, or edit entries as needed.
 rules:
-  - "1. Be respectful to all players."
-  - "2. No griefing or stealing."
-  - "3. No hacking, cheating, or exploiting bugs."
-  - "4. No spamming or excessive caps in chat."
-  - "5. Listen to and respect staff decisions."
-  - "6. Have fun!"
+  - "1. No griefing or destroying other players’ builds."
+  - "2. No stealing items, chests, or builds that aren’t yours."
+  - "3. No hacking, cheating, x-ray, or unfair mods."
+  - "4. No duplication glitches or bug exploits. Report them instead."
+  - "5. No lag machines or anything that intentionally lags the server."
+  - "6. PvP is only allowed if both players agree.
+  - "7. No spam, flooding chat, or excessive caps."
+  - "8. Be respectful to all players and staff."
+  - "9. No advertising other servers or communities."
+  - "10. Follow staff instructions at all times."
+  - "11. Do not abuse bugs or glitches in any way."
+  - "12. Report exploits immediately and do not share them."
 
 # Join message sent privately to new players
 # Use & for colour codes, e.g. &a for green, &e for yellow.
