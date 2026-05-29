@@ -37,7 +37,7 @@ public class ShopManager {
     private void registerItems() {
         items.add(new ShopItem("Wool x64",                          35,  64,  8));
         items.add(new ShopItem("Golden Axe Tree-Chopper (1 hour)", -1,   1, 32));
-        items.add(new ShopItem("Steak x16",                   320, 6, 2));
+        items.add(new ShopItem("Steak x16",                   364, 6, 2));
         items.add(new ShopItem("TNT x16",             46,  64, 24));
     }
 
@@ -191,6 +191,43 @@ public class ShopManager {
 
         player.updateInventory();
     }
+
+    private int getMaxStackSize(int itemId) {
+    switch (itemId) {
+        // Swords
+        case 267: case 268: case 272: case 276: case 283:
+        // Shovels
+        case 256: case 269: case 273: case 277: case 284:
+        // Pickaxes
+        case 257: case 270: case 274: case 278: case 285:
+        // Axes
+        case 258: case 271: case 275: case 279: case 286:
+        // Hoes
+        case 290: case 291: case 292: case 293: case 294:
+        // Misc tools
+        case 259: case 261: case 346: case 359:
+        // Armour
+        case 298: case 299: case 300: case 301:
+        case 302: case 303: case 304: case 305:
+        case 306: case 307: case 308: case 309:
+        case 310: case 311: case 312: case 313:
+        case 314: case 315: case 316: case 317:
+        // Food (non-stackable in Beta 1.7.3)
+        case 319: case 320: case 349: case 350:
+        case 357: case 360: case 363: case 364:
+        case 365: case 366: case 367: case 373:
+        // Buckets, boats, minecarts, doors, signs
+        case 325: case 326: case 327:
+        case 328: case 333: case 342: case 343:
+        case 64: case 323: case 324:
+            return 1;
+        // Snowballs, eggs
+        case 332: case 344:
+            return 16;
+        default:
+            return 64;
+    }
+}
 
     private boolean hasGoldenAxe(Player player) {
         for (ItemStack stack : player.getInventory().getContents()) {
