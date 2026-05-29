@@ -1,0 +1,9 @@
+name: DiamondShop
+version: 1.0.0
+main: com.shop.plugin.ShopPlugin
+description: A simple diamond-based shop for Beta 1.7.3
+author: Generated
+commands:
+  shop:
+    description: Opens the shop
+    usage: /shop

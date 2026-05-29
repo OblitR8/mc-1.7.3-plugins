@@ -1,0 +1,11 @@
+name: DiscordWebhook
+main: uk.co.homehosting.discordwebhook.DiscordWebhookPlugin
+version: ${project.version}
+description: Sends Minecraft chat, joins, and leaves to a Discord webhook
+author: HomeHostingNetwork
+
+commands:
+  discordwebhook:
+    description: Reload the DiscordWebhook plugin config
+    usage: /discordwebhook reload
+    permission: discordwebhook.reload

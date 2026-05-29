@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# DiscordWebhook — Project Poseidon (Beta 1.7.3)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# SETUP
+#   1. In Discord: Server Settings > Integrations > Webhooks > New Webhook
+#   2. Copy the webhook URL and paste it below.
+#   3. Restart the server or run:  /discordwebhook reload
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+webhook-url: "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN"
+
+# Name displayed in Discord for every message
+bot-username: "Minecraft"
+
+# Avatar shown in Discord — must be a public https:// image URL.
+# Example: "https://example.com/avatar.png"
+# Leave blank to use the webhook's default avatar set in Discord settings.
+bot-avatar-url: ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MESSAGE FORMATS
+#   {player}  — the player's username
+#   {message} — the chat message
+# ─────────────────────────────────────────────────────────────────────────────
+
+chat-format:  "**{player}** » {message}"
+join-format:  "✅ **{player}** joined the server."
+leave-format: "❌ **{player}** left the server."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EMBEDS
+#   false — plain text messages (default)
+#   true  — coloured embed cards
+# ─────────────────────────────────────────────────────────────────────────────
+
+use-embeds: false
+
+# Accent colours for embeds — decimal RGB values (only used when use-embeds: true)
+# Blue   5793266  |  Green  5025616  |  Red  15158332
+embed-color-chat:  5793266
+embed-color-join:  5025616
+embed-color-leave: 15158332

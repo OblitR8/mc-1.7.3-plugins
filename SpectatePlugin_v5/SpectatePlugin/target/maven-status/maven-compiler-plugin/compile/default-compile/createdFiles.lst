@@ -1,0 +1,8 @@
+com\spectate\SpectateCommand.class
+com\spectate\SpectateManager.class
+com\spectate\SpectateSession.class
+com\spectate\NmsUtil.class
+com\spectate\SpectateListener.class
+com\spectate\SpectatePlugin$2.class
+com\spectate\SpectatePlugin$1.class
+com\spectate\SpectatePlugin.class

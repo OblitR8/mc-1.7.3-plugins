@@ -1,0 +1,5 @@
+name: TreeChop
+version: 1.0.0
+main: com.treechop.plugin.TreeChopPlugin
+description: Golden Axe tree-chopper with 1-hour timed buff for Beta 1.7.3
+author: Generated

@@ -1,0 +1,15 @@
+name: SpectatePlugin
+main: com.spectate.SpectatePlugin
+version: 4.0.0
+description: Silent OP moderation spectator plugin for Project Poseidon b1.7.3
+author: SpectatePlugin
+
+commands:
+  sp:
+    description: OP-only spectate suite. /sp help for sub-commands.
+    usage: /sp <player|stop|follow|god|freeze|tp|status|help>
+
+permissions:
+  spectate.use:
+    description: Allows use of all /sp sub-commands
+    default: op

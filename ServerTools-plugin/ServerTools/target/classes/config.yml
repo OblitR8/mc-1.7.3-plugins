@@ -1,0 +1,21 @@
+# ServerTools Configuration
+# Project Poseidon - Beta 1.7.3
+
+# Server rules displayed by /rules
+# Add, remove, or edit entries as needed.
+rules:
+  - "1. Be respectful to all players."
+  - "2. No griefing or stealing."
+  - "3. No hacking, cheating, or exploiting bugs."
+  - "4. No spamming or excessive caps in chat."
+  - "5. Listen to and respect staff decisions."
+  - "6. Have fun!"
+
+# Join message sent privately to new players
+# Use & for colour codes, e.g. &a for green, &e for yellow.
+join-message:
+  enabled: true
+  lines:
+    - "&eWelcome to the server!"
+    - "&aType &f/rules &ato read the server rules."
+    - "&aType &f/help &ato see all available commands."

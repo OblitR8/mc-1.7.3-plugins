@@ -1,0 +1,49 @@
+name: ServerTools
+version: ${project.version}
+description: Essential server utility commands for Project Poseidon (Beta 1.7.3)
+author: PizzaDonutDev
+main: uk.home_hosting_network.servertools.ServerTools
+
+commands:
+  players:
+    description: Shows all online players
+    usage: /<command>
+    permission: servertools.players
+    permission-message: You do not have permission to use this command.
+  help:
+    description: Shows all available commands
+    usage: /<command>
+    permission: servertools.help
+    permission-message: You do not have permission to use this command.
+  rules:
+    description: Shows the server rules
+    usage: /<command>
+    permission: servertools.rules
+    permission-message: You do not have permission to use this command.
+  ticks:
+    description: Shows the current server TPS (ticks per second)
+    usage: /<command>
+    permission: servertools.ticks
+    permission-message: You do not have permission to use this command.
+
+permissions:
+  servertools.*:
+    description: Grants access to all ServerTools commands
+    default: op
+    children:
+      servertools.players: true
+      servertools.help: true
+      servertools.rules: true
+      servertools.ticks: true
+  servertools.players:
+    description: Allows use of /players
+    default: true
+  servertools.help:
+    description: Allows use of /help
+    default: true
+  servertools.rules:
+    description: Allows use of /rules
+    default: true
+  servertools.ticks:
+    description: Allows use of /ticks
+    default: op
