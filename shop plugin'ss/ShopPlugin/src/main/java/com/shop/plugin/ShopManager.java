@@ -38,7 +38,7 @@ public class ShopManager {
         items.add(new ShopItem("Wool x64",                          35,  64,  8));
         items.add(new ShopItem("Golden Axe Tree-Chopper (1 hour)", -1,   1, 32));
         items.add(new ShopItem("Steak x16",                   320, 6, 2));
-        items.add(new ShopItem("TNT x16",             46,  64, 16));
+        items.add(new ShopItem("TNT x16",             46,  64, 24));
     }
 
     // ------------------------------------------------------------------
