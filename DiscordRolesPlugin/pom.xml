@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.discordroles</groupId>
+    <artifactId>DiscordRolesPlugin</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>DiscordRolesPlugin</name>
+    <description>Discord role integration for Minecraft Beta 1.7.3 (Project Poseidon)</description>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <!-- Official Project Poseidon / Beta 1.7.3 Maven repository -->
+        <!-- https://wiki.retromc.org/Setting_up_a_Project_Poseidon_Plugin -->
+        <repository>
+            <id>johnymuffin-nexus-releases</id>
+            <url>https://repository.johnymuffin.com/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- JDA (Discord API) -->
+        <repository>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Project Poseidon CraftBukkit API (Beta 1.7.3) -->
+        <!-- groupId/artifactId/version from https://wiki.retromc.org/Setting_up_a_Project_Poseidon_Plugin -->
+        <dependency>
+            <groupId>com.legacyminecraft.poseidon</groupId>
+            <artifactId>poseidon-craftbukkit</artifactId>
+            <version>1.1.8</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JDA - Discord API wrapper (older version, Java 8 compatible) -->
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>4.4.1_353</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>club.minnced</groupId>
+                    <artifactId>opus-java</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- No SQLite needed — links are stored in links.yml using Poseidon's
+             built-in org.bukkit.util.config.Configuration (zero native deps) -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Shade all dependencies into one fat JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <!-- No extra relocations needed -->
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

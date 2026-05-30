@@ -1,0 +1,6 @@
+com\discordroles\DiscordRolesPlugin.class
+com\discordroles\utils\ColorUtil.class
+com\discordroles\storage\DatabaseManager.class
+com\discordroles\discord\DiscordBotManager.class
+com\discordroles\listeners\ChatListener.class
+com\discordroles\listeners\CommandHandler.class
