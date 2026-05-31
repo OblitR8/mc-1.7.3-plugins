@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
@@ -77,7 +78,8 @@ public class DiscordBotManager extends ListenerAdapter {
 
         try {
             jda = JDABuilder.createDefault(token)
-                    .enableIntents(GatewayIntent.GUILD_MESSAGES)
+                    .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .addEventListeners(this)
                     .build();
 
@@ -302,14 +304,11 @@ public class DiscordBotManager extends ListenerAdapter {
         Guild guild = jda.getGuildById(guildId);
         if (guild == null) return null;
 
-        Member member;
-        try {
-            member = guild.retrieveMemberById(discordId).complete();
-        } catch (Exception e) {
-            // Member left the server, or stale/invalid ID
+        Member member = guild.getMemberById(discordId);
+        if (member == null) {
+            // Avoid blocking the Bukkit thread by never falling back to REST here.
             return null;
         }
-        if (member == null) return null;
 
         List<String> ignoredRoles  = plugin.cfg().getStringList("ignored-roles",  new ArrayList<String>());
         List<String> priorityRoles = plugin.cfg().getStringList("role-priority",   new ArrayList<String>());

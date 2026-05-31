@@ -8,7 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Reformats Minecraft player chat based on the player's linked Discord role.
@@ -22,10 +23,33 @@ public class ChatListener implements Listener {
 
     private final DiscordRolesPlugin plugin;
     private final DiscordBotManager botManager;
+    private final String roleChatTemplate;
+    private final String noRoleChatTemplate;
+    private final String defaultRoleColour;
+    private final Map<String, String> roleColours = new HashMap<>();
 
     public ChatListener(DiscordRolesPlugin plugin, DiscordBotManager botManager) {
         this.plugin     = plugin;
         this.botManager = botManager;
+
+        this.roleChatTemplate = plugin.cfg().getString(
+                "role-chat-format",
+                "&8[&b{role}&8] &f{player}&7: &f{message}"
+        );
+        this.noRoleChatTemplate = plugin.cfg().getString(
+                "no-role-chat-format",
+                "&8[&7player&8] &f{player}&7: &f{message}"
+        );
+        this.defaultRoleColour = ColorUtil.colorize(
+                plugin.cfg().getString("default-role-colour", "&b")
+        );
+
+        for (String key : plugin.cfg().getKeys("role-colours")) {
+            String value = plugin.cfg().getString("role-colours." + key, null);
+            if (value != null) {
+                roleColours.put(key.toLowerCase(), ColorUtil.colorize(value));
+            }
+        }
     }
 
     // Event.Priority.Highest is the CB1060 enum value (capital-case, not ALL_CAPS)
@@ -40,23 +64,15 @@ public class ChatListener implements Listener {
         String formatted;
         if (roleName != null) {
             String roleColour = getRoleColour(roleName);
-            String template = plugin.cfg().getString(
-                    "role-chat-format",
-                    "&8[&b{role}&8] &f{player}&7: &f{message}"
-            );
             formatted = ColorUtil.colorize(
-                    template
+                    roleChatTemplate
                         .replace("{role}",    roleColour + roleName)
                         .replace("{player}",  playerName)
                         .replace("{message}", message)
             );
         } else {
-            String template = plugin.cfg().getString(
-                    "no-role-chat-format",
-                    "&8[&7player&8] &f{player}&7: &f{message}"
-            );
             formatted = ColorUtil.colorize(
-                    template
+                    noRoleChatTemplate
                         .replace("{player}",  playerName)
                         .replace("{message}", message)
             );
@@ -72,13 +88,7 @@ public class ChatListener implements Listener {
     // ---------------------------------------------------------------
 
     private String getRoleColour(String roleName) {
-        // In the old Configuration API, nested keys are accessed via dot notation
-        String colourVal = plugin.cfg().getString("role-colours." + roleName, null);
-        if (colourVal != null) {
-            return ColorUtil.colorize(colourVal);
-        }
-        return ColorUtil.colorize(
-                plugin.cfg().getString("default-role-colour", "&b")
-        );
+        String colourVal = roleColours.get(roleName.toLowerCase());
+        return colourVal != null ? colourVal : defaultRoleColour;
     }
 }
