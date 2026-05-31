@@ -1,23 +1,29 @@
 name: DiscordRolesPlugin
 main: com.discordroles.DiscordRolesPlugin
 version: 1.0.0
-description: Integrates Discord roles into Minecraft Beta 1.7.3 chat
+description: Discord role integration for Minecraft Beta 1.7.3
 author: DiscordRoles
-api-version: "1.0"
 
 commands:
+  discord:
+    description: Discord account commands
+    usage: /discord confirm <code>
+    hidden: false
   discordlink:
-    description: Link your Minecraft account to Discord
+    description: Shows how to link your Minecraft account to Discord
     usage: /discordlink
+    hidden: false
   discordunlink:
-    description: Unlink your Minecraft account from Discord
+    description: Unlinks your Minecraft account from Discord
     usage: /discordunlink
+    hidden: false
   discordreload:
-    description: Reload the Discord plugin configuration
+    description: Reloads the DiscordRoles configuration
     usage: /discordreload
     permission: discordroles.admin
+    hidden: false
 
 permissions:
   discordroles.admin:
-    description: Admin commands for DiscordRoles
+    description: Access to admin commands for DiscordRoles
     default: op

@@ -4,152 +4,145 @@ import com.discordroles.discord.DiscordBotManager;
 import com.discordroles.listeners.ChatListener;
 import com.discordroles.listeners.CommandHandler;
 import com.discordroles.storage.DatabaseManager;
+import com.discordroles.storage.PendingLinkManager;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.io.InputStream;
 
 /**
- * DiscordRolesPlugin — Main entry point.
+ * DiscordRolesPlugin — main entry point.
+ * Targets Project Poseidon (CB1060 Bukkit API).
  *
- * NOTE: This targets Project Poseidon (CB1060 Bukkit API).
- * Key differences from modern Bukkit:
- *   - getConfiguration() instead of getConfig()
- *   - getServer().getLogger() instead of getLogger()
- *   - No saveDefaultConfig() / reloadConfig() — implemented manually below
- *   - @EventHandler uses Event.Priority, not EventPriority
+ * CB1060 scheduler API uses plain Runnable via:
+ *   getServer().getScheduler().scheduleSyncRepeatingTask(plugin, runnable, delay, period)
+ * BukkitRunnable does NOT exist in this version.
  */
 public class DiscordRolesPlugin extends JavaPlugin {
 
-    private DatabaseManager databaseManager;
-    private DiscordBotManager botManager;
-
-    // Convenience logger field so other classes can call plugin.log()
-    private Logger logger;
+    private DatabaseManager    db;
+    private PendingLinkManager pending;
+    private DiscordBotManager  bot;
+    private CommandHandler     commandHandler;
 
     // ---------------------------------------------------------------
-    //  Plugin lifecycle
+    //  Lifecycle
     // ---------------------------------------------------------------
 
     @Override
     public void onEnable() {
-        logger = getServer().getLogger();
-
-        // 1. Config — save default config.yml if it doesn't exist yet
+        // 1. Config
         saveDefaultConfig();
 
-        // 2. Database
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdirs();
-        }
-        databaseManager = new DatabaseManager(this);
-        databaseManager.initialise();
+        // 2. Persistent storage
+        if (!getDataFolder().exists()) getDataFolder().mkdirs();
+        db = new DatabaseManager(this);
+        db.initialise();
 
-        // 3. Discord bot
-        botManager = new DiscordBotManager(this, databaseManager);
-        botManager.start();
+        // 3. Pending link store (in-memory, thread-safe)
+        pending = new PendingLinkManager();
 
-        // 4. Listeners & commands
-        CommandHandler cmdHandler = new CommandHandler(this, databaseManager);
-        getCommand("discordlink").setExecutor(cmdHandler);
-        getCommand("discordunlink").setExecutor(cmdHandler);
-        getCommand("discordreload").setExecutor(cmdHandler);
+        // 4. Discord bot
+        bot = new DiscordBotManager(this, db, pending);
+        bot.start();
 
+        // 5. Command handler and chat listener
+        commandHandler = new CommandHandler(this, db, pending);
         getServer().getPluginManager().registerEvents(
-                new ChatListener(this, botManager), this
+                new ChatListener(this, bot), this
         );
 
-        log("DiscordRolesPlugin enabled!");
+        // 6. Purge expired pending codes every 2 minutes (2400 ticks @ 20tps)
+        //    CB1060 API: scheduleSyncRepeatingTask(plugin, runnable, delay, period)
+        final PendingLinkManager pendingRef = pending;
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                pendingRef.purgeExpired();
+            }
+        }, 2400L, 2400L);
+
+        log("DiscordRolesPlugin enabled.");
     }
 
     @Override
     public void onDisable() {
-        if (botManager != null) {
-            botManager.stop();
-        }
-        if (databaseManager != null) {
-            databaseManager.close();
-        }
+        // Cancel all tasks registered by this plugin
+        getServer().getScheduler().cancelTasks(this);
+        if (bot != null) bot.stop();
+        if (db  != null) db.close();
         log("DiscordRolesPlugin disabled.");
     }
 
     // ---------------------------------------------------------------
-    //  Config helpers (manual, since CB1060 JavaPlugin lacks these)
+    //  Command routing — override onCommand directly on JavaPlugin,
+    //  the most reliable approach for CB1060.
+    // ---------------------------------------------------------------
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command,
+                             String label, String[] args) {
+        if (commandHandler == null) return false;
+        return commandHandler.onCommand(sender, command, label, args);
+    }
+
+    // ---------------------------------------------------------------
+    //  Config helpers  (CB1060 lacks saveDefaultConfig / reloadConfig)
     // ---------------------------------------------------------------
 
     /**
-     * Copies config.yml from the JAR to the data folder if it doesn't exist.
-     * Replaces the modern saveDefaultConfig().
+     * Copies the bundled config.yml to the data folder if absent.
      */
     public void saveDefaultConfig() {
-        File configFile = new File(getDataFolder(), "config.yml");
-        if (configFile.exists()) return;
+        File file = new File(getDataFolder(), "config.yml");
+        if (file.exists()) return;
+        if (!getDataFolder().exists()) getDataFolder().mkdirs();
 
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdirs();
-        }
-
-        try (InputStream in = getClass().getResourceAsStream("/config.yml");
-             FileOutputStream out = new FileOutputStream(configFile)) {
-            if (in == null) {
-                log("WARNING: No default config.yml found in JAR!");
-                return;
-            }
+        try (InputStream     in  = getClass().getResourceAsStream("/config.yml");
+             FileOutputStream out = new FileOutputStream(file)) {
+            if (in == null) { log("WARNING: Bundled config.yml not found in JAR."); return; }
             byte[] buf = new byte[4096];
             int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
+            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
         } catch (IOException e) {
-            log("ERROR: Could not save default config.yml: " + e.getMessage());
+            log("ERROR: Could not save default config.yml — " + e.getMessage());
         }
     }
 
     /**
-     * Reloads config.yml from disk.
-     * Replaces the modern reloadConfig().
+     * Reloads config from disk and fully restarts the Discord bot.
      */
     public void reloadPluginConfig() {
         getConfiguration().load();
-
-        // Restart bot with potentially new token / channel IDs
-        if (botManager != null) {
-            botManager.stop();
-        }
-        botManager = new DiscordBotManager(this, databaseManager);
-        botManager.start();
-
-        // Re-register chat listener with the new bot reference
+        if (bot != null) bot.stop();
+        bot = new DiscordBotManager(this, db, pending);
+        bot.start();
         getServer().getPluginManager().registerEvents(
-                new ChatListener(this, botManager), this
+                new ChatListener(this, bot), this
         );
-        log("DiscordRoles config reloaded and bot restarted.");
+        log("Configuration reloaded and bot restarted.");
     }
 
     // ---------------------------------------------------------------
     //  Accessors
     // ---------------------------------------------------------------
 
-    /** Returns the loaded Configuration object (old CB1060 API). */
+    /** CB1060-compatible config accessor (wraps getConfiguration()). */
     public Configuration cfg() {
-        Configuration c = getConfiguration();
-        return c;
+        return getConfiguration();
     }
 
-    /** Convenience logger so other classes don't need getServer().getLogger(). */
-    public Logger log() {
-        return logger != null ? logger : getServer().getLogger();
-    }
-
-    /** Log an info message, prefixed with the plugin name. */
+    /** Logs a message prefixed with [DiscordRoles]. */
     public void log(String msg) {
         getServer().getLogger().info("[DiscordRoles] " + msg);
     }
 
-    public DatabaseManager getDatabaseManager() { return databaseManager; }
-    public DiscordBotManager getBotManager()     { return botManager; }
+    public DatabaseManager    getDb()      { return db; }
+    public PendingLinkManager getPending() { return pending; }
+    public DiscordBotManager  getBot()     { return bot; }
 }
