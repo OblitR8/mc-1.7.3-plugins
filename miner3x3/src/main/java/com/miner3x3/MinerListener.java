@@ -10,6 +10,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -45,6 +46,21 @@ public class MinerListener implements Listener {
     }
 
     // ── 3x3 mining ───────────────────────────────────────────────────────────
+    @EventHandler(priority = Event.Priority.Normal)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player)) return;
+
+        Player player = (Player) event.getDamager();
+        if (!plugin.minerPickaxeHolders.contains(player.getUniqueId())) return;
+
+        ItemStack item = player.getItemInHand();
+        if (item == null || item.getType() != Material.GOLD_PICKAXE) return;
+
+        // Attack durability is not always fired through PlayerItemDamageEvent on this server version,
+        // so refresh the pickaxe immediately after hitting an entity.
+        resetDurability(player, item);
+    }
+
     @EventHandler(priority = Event.Priority.Normal)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
