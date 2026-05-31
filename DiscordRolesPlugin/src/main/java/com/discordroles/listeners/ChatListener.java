@@ -44,10 +44,13 @@ public class ChatListener implements Listener {
                 plugin.cfg().getString("default-role-colour", "&b")
         );
 
-        for (String key : plugin.cfg().getKeys("role-colours")) {
-            String value = plugin.cfg().getString("role-colours." + key, null);
-            if (value != null) {
-                roleColours.put(key.toLowerCase(), ColorUtil.colorize(value));
+        java.util.List<String> keys = plugin.cfg().getKeys("role-colours");
+        if (keys != null) {
+            for (String key : keys) {
+                String value = plugin.cfg().getString("role-colours." + key, null);
+                if (value != null) {
+                    roleColours.put(key.toLowerCase(), ColorUtil.colorize(value));
+                }
             }
         }
     }
