@@ -20,10 +20,10 @@ commands:
     usage: /<command>
     permission: servertools.rules
     permission-message: You do not have permission to use this command.
-  ticks:
-    description: Shows the current server TPS (ticks per second)
+  shop:
+    description: Shows server items to purchase
     usage: /<command>
-    permission: servertools.ticks
+    permission: servertools.shop
     permission-message: You do not have permission to use this command.
 
 permissions:

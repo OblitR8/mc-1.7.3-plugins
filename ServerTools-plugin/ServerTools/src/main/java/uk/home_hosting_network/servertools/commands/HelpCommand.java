@@ -23,8 +23,8 @@ public class HelpCommand implements CommandExecutor {
         sender.sendMessage(ColorUtil.header("Server Commands"));
         sender.sendMessage(ChatColor.YELLOW + "/players" + ChatColor.WHITE + " - Show all online players");
         sender.sendMessage(ChatColor.YELLOW + "/rules"   + ChatColor.WHITE + " - Show the server rules");
-        sender.sendMessage(ChatColor.YELLOW + "/ticks"   + ChatColor.WHITE + " - Show current server TPS");
         sender.sendMessage(ChatColor.YELLOW + "/help"    + ChatColor.WHITE + " - Show this help message");
+        sender.sendMessage(ChatColor.YELLOW + "/shop" + ChatColor.WHITE + " - Server items to purchase");
         return true;
     }
 }

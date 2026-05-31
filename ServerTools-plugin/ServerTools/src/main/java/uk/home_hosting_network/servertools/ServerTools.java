@@ -4,7 +4,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import uk.home_hosting_network.servertools.commands.HelpCommand;
 import uk.home_hosting_network.servertools.commands.PlayersCommand;
 import uk.home_hosting_network.servertools.commands.RulesCommand;
-import uk.home_hosting_network.servertools.commands.TicksCommand;
 import uk.home_hosting_network.servertools.listeners.PlayerJoinListener;
 import uk.home_hosting_network.servertools.util.PluginConfig;
 
@@ -41,7 +40,6 @@ public class ServerTools extends JavaPlugin {
         getCommand("players").setExecutor(new PlayersCommand(this));
         getCommand("help").setExecutor(new HelpCommand(this));
         getCommand("rules").setExecutor(new RulesCommand(this));
-        getCommand("ticks").setExecutor(new TicksCommand(this));
 
         // Register listener
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
