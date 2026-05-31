@@ -9,7 +9,7 @@ guild-id: "1492372179508264971"
 
 # The ID of the Discord channel to use for account linking commands
 # Players will use the bot here to link their accounts
-link-channel-id: "1510413954344554527"
+link-channel-id: "1510488511030235248"
 
 # Chat format settings
 # Available placeholders:
