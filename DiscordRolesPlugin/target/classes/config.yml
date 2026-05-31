@@ -1,0 +1,55 @@
+# DiscordRolesPlugin Configuration
+# =========================================
+
+# Your Discord Bot Token (from https://discord.com/developers/applications)
+bot-token: "MTUxMDQwODE5NDg5NDIwMDkxMg.G5UZG_.OPawhHsHa8AJn1x8l7uBIGGK1abGd6JKZPdWug"
+
+# The ID of your Discord server (guild)
+guild-id: "1492372179508264971"
+
+# The ID of the Discord channel to use for account linking commands
+# Players will use the bot here to link their accounts
+link-channel-id: "1510413954344554527"
+
+# Chat format settings
+# Available placeholders:
+#   {role}     - The player's highest Discord role name (blank if no roles)
+#   {player}   - The Minecraft player's username
+#   {message}  - The chat message
+#
+# Format when a player HAS a Discord role:
+role-chat-format: "&8[&b{role}&8] &f{player}&7: &f{message}"
+
+# Format when a player has NO Discord role (or isn't linked):
+no-role-chat-format: "&8[&7player&8] &f{player}&7: &f{message}"
+
+# Roles to IGNORE (e.g. @everyone, Nitro Booster, Bot roles)
+# These role names will be skipped when finding the player's display role
+ignored-roles:
+  - "@everyone"
+  - "Nitro Booster"
+  - "Server Booster"
+
+# Role priority order — roles listed FIRST take priority in chat display
+# Add your Discord role names here in the order you want them to appear
+# If a player has multiple roles, the FIRST match in this list is used
+role-priority:
+  - "Owner"
+  - "OG"
+
+# Role colours in Minecraft chat (using & colour codes)
+# If a role is not listed here it will use the default colour
+role-colours:
+  "Owner": "&6"
+  "OG": "&d"
+
+# Default colour for roles not listed in role-colours above
+default-role-colour: "&b"
+
+# Messages sent to players in-game
+messages:
+  link-instructions: "&aTo link your account, go to the #link channel in our Discord and use the link command there!"
+  already-linked: "&eYour account is already linked to Discord! Use /discordunlink to unlink first."
+  unlink-success: "&aYour Discord account has been successfully unlinked."
+  not-linked: "&eYou don't have a linked Discord account."
+  reload-success: "&aDiscordRoles configuration reloaded."

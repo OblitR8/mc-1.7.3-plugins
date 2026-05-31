@@ -1,0 +1,9 @@
+com\discordroles\storage\PendingLink.class
+com\discordroles\DiscordRolesPlugin.class
+com\discordroles\storage\PendingLinkManager.class
+com\discordroles\utils\ColorUtil.class
+com\discordroles\storage\DatabaseManager.class
+com\discordroles\DiscordRolesPlugin$1.class
+com\discordroles\discord\DiscordBotManager.class
+com\discordroles\listeners\ChatListener.class
+com\discordroles\listeners\CommandHandler.class
