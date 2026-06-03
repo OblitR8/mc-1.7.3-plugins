@@ -11,15 +11,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- * Handles all in-game slash commands for DiscordRolesPlugin.
+ * Handles all in-game slash commands.
  *
- * Commands declared in plugin.yml:
- *   /discord confirm <code>  - Confirm a pending account link (main security step)
- *   /discordlink             - Prints linking instructions
- *   /discordunlink           - Removes the player's confirmed link
- *   /discordreload           - (OP) Reloads config and restarts bot
+ *   /discord confirm <code>  Confirm a pending account link
+ *   /discordlink             Show linking instructions
+ *   /discordunlink           Remove a confirmed link
+ *   /discordreload           (OP) Reload config and restart bot
  *
- * Wired via JavaPlugin.onCommand() override for CB1060 compatibility.
+ * Wired via JavaPlugin.onCommand() override — most reliable for CB1060.
  */
 public class CommandHandler implements CommandExecutor {
 
@@ -36,8 +35,8 @@ public class CommandHandler implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Resolve command name from either command or label (CB1060 safety)
+    public boolean onCommand(CommandSender sender, Command command,
+                             String label, String[] args) {
         String name = command.getName();
         if (name == null || name.isEmpty()) name = label;
         if (name == null) return false;
@@ -45,15 +44,15 @@ public class CommandHandler implements CommandExecutor {
 
         switch (name) {
             case "discord":       return handleDiscord(sender, args);
-            case "discordlink":   handleLink(sender);    return true;
-            case "discordunlink": handleUnlink(sender);  return true;
-            case "discordreload": handleReload(sender);  return true;
+            case "discordlink":   handleLink(sender);   return true;
+            case "discordunlink": handleUnlink(sender); return true;
+            case "discordreload": handleReload(sender); return true;
             default:              return false;
         }
     }
 
     // ---------------------------------------------------------------
-    //  /discord confirm <code>   (the main security confirmation step)
+    //  /discord confirm <code>
     // ---------------------------------------------------------------
 
     private boolean handleDiscord(CommandSender sender, String[] args) {
@@ -62,10 +61,8 @@ public class CommandHandler implements CommandExecutor {
             return true;
         }
 
-        // Must be: /discord confirm <code>
         if (args.length < 2 || !args[0].equalsIgnoreCase("confirm")) {
-            sender.sendMessage(ColorUtil.colorize(
-                    "&cUsage: &f/discord confirm <code>"));
+            sender.sendMessage(ColorUtil.colorize("&cUsage: &f/discord confirm <code>"));
             return true;
         }
 
@@ -76,52 +73,49 @@ public class CommandHandler implements CommandExecutor {
         // Already linked?
         if (db.isLinked(mcName)) {
             player.sendMessage(ColorUtil.colorize(
-                    "&eYour account is already linked! "
+                    "&eYour account is already linked. "
                   + "Use &f/discordunlink &eif you need to change it."));
             return true;
         }
 
-        // Is there a pending link for this Minecraft username?
+        // Pending link exists for this name?
         PendingLink link = pending.getByMinecraft(mcName);
         if (link == null) {
-            player.sendMessage(ColorUtil.colorize(
-                    "&cNo pending link found for your username."));
+            player.sendMessage(ColorUtil.colorize("&cNo pending link found for your username."));
             player.sendMessage(ColorUtil.colorize(
                     "&7Go to the &f#link &7channel in our Discord and run &f/discordlink " + mcName));
             return true;
         }
 
-        // Check the code — constant-time comparison to prevent timing attacks
+        // Wrong code?
         if (!constantTimeEquals(link.getCode(), entered)) {
             player.sendMessage(ColorUtil.colorize(
                     "&cIncorrect code. Please check the code sent to you in Discord."));
             player.sendMessage(ColorUtil.colorize(
-                    "&7Your code expires in &f" + link.secondsRemaining() + "s&7."));
+                    "&7Code expires in &f" + link.secondsRemaining() + "s&7."));
             return true;
         }
 
-        // Code matches — check it hasn't expired (belt-and-suspenders, getByMinecraft
-        // already returns null for expired, but check again after code comparison)
+        // Expired? (belt-and-suspenders — getByMinecraft already rejects expired,
+        // but we re-check here after the code comparison)
         if (link.isExpired()) {
             pending.remove(mcName);
+            player.sendMessage(ColorUtil.colorize("&cYour code has expired."));
             player.sendMessage(ColorUtil.colorize(
-                    "&cYour confirmation code has expired."));
-            player.sendMessage(ColorUtil.colorize(
-                    "&7Please run &f/discordlink " + mcName + " &7in Discord again to get a new code."));
+                    "&7Run &f/discordlink " + mcName + " &7in Discord to get a new one."));
             return true;
         }
 
-        // Final check: is the discord ID still not permanently linked?
-        // (Handles edge case where two pending links race)
+        // Race condition guard — did someone else already link this Discord ID?
         if (db.isDiscordLinked(link.getDiscordId())) {
             pending.remove(mcName);
             player.sendMessage(ColorUtil.colorize(
-                    "&cYour Discord account was already linked to another Minecraft name. "
-                  + "Please run &f/resetlink &cin Discord first."));
+                    "&cYour Discord account is already linked to another name. "
+                  + "Run &f/resetlink &cin Discord first."));
             return true;
         }
 
-        // All checks passed — commit the link
+        // All checks passed — commit
         boolean ok = db.linkAccount(mcName, link.getDiscordId());
         pending.remove(mcName);
 
@@ -134,13 +128,13 @@ public class CommandHandler implements CommandExecutor {
         } else {
             player.sendMessage(ColorUtil.colorize(
                     "&cA storage error occurred. Please try again or contact an admin."));
-            plugin.log("ERROR: Failed to save link for MC=" + mcName);
+            plugin.log("ERROR: Failed to persist link for MC=" + mcName);
         }
         return true;
     }
 
     // ---------------------------------------------------------------
-    //  /discordlink  (tells the player what to do in Discord)
+    //  /discordlink — show instructions
     // ---------------------------------------------------------------
 
     private void handleLink(CommandSender sender) {
@@ -153,7 +147,7 @@ public class CommandHandler implements CommandExecutor {
 
         if (db.isLinked(name)) {
             player.sendMessage(ColorUtil.colorize(
-                    "&eYour account is already linked! "
+                    "&eYour account is already linked. "
                   + "Use &f/discordunlink &eif you want to remove it."));
             return;
         }
@@ -164,7 +158,7 @@ public class CommandHandler implements CommandExecutor {
         player.sendMessage(ColorUtil.colorize(
                 "&72. Run: &f/discordlink " + name));
         player.sendMessage(ColorUtil.colorize(
-                "&73. Come back here and run: &f/discord confirm <code>"));
+                "&73. Return here and run: &f/discord confirm <code>"));
     }
 
     // ---------------------------------------------------------------
@@ -179,7 +173,7 @@ public class CommandHandler implements CommandExecutor {
         Player player = (Player) sender;
         String name   = player.getName();
 
-        // Also clear any pending link
+        // Clear pending link
         pending.remove(name);
 
         if (!db.isLinked(name)) {
@@ -188,14 +182,20 @@ public class CommandHandler implements CommandExecutor {
             return;
         }
 
+        // Invalidate role cache before removing the link
+        String discordId = db.getDiscordId(name);
+        if (discordId != null && plugin.getBot() != null) {
+            plugin.getBot().invalidateRoleCache(discordId);
+        }
+
         db.unlinkByMinecraftName(name);
-        plugin.log("Player " + name + " unlinked their Discord account in-game.");
+        plugin.log("In-game unlink: MC=" + name);
         player.sendMessage(ColorUtil.colorize(
                 "&aYour Discord account has been unlinked."));
     }
 
     // ---------------------------------------------------------------
-    //  /discordreload  (OP only)
+    //  /discordreload (OP)
     // ---------------------------------------------------------------
 
     private void handleReload(CommandSender sender) {
@@ -208,20 +208,16 @@ public class CommandHandler implements CommandExecutor {
     }
 
     // ---------------------------------------------------------------
-    //  Security helper
+    //  Constant-time string comparison (security best practice)
     // ---------------------------------------------------------------
 
-    /**
-     * Compares two strings in constant time to prevent timing-based attacks.
-     * Even though a 6-digit code is not highly sensitive, it's good practice.
-     */
     private boolean constantTimeEquals(String a, String b) {
         if (a == null || b == null) return false;
         if (a.length() != b.length()) return false;
-        int result = 0;
+        int diff = 0;
         for (int i = 0; i < a.length(); i++) {
-            result |= a.charAt(i) ^ b.charAt(i);
+            diff |= a.charAt(i) ^ b.charAt(i);
         }
-        return result == 0;
+        return diff == 0;
     }
 }

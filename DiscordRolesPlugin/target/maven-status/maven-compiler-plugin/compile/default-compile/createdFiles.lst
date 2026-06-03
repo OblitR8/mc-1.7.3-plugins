@@ -1,4 +1,5 @@
 com\discordroles\storage\PendingLink.class
+com\discordroles\discord\RoleCache.class
 com\discordroles\DiscordRolesPlugin.class
 com\discordroles\storage\PendingLinkManager.class
 com\discordroles\utils\ColorUtil.class

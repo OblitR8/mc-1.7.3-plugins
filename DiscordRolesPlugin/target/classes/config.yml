@@ -2,7 +2,7 @@
 # =========================================
 
 # Your Discord Bot Token (from https://discord.com/developers/applications)
-bot-token: "MTUxMDc4NDE1MDE2NzA5MzMwOQ.Gdfv0C.QmUutpJjoeVCaJtmcvABuAC8k7QIFgV9DrKoU4"
+bot-token: "MTUxMDc4NDE1MDE2NzA5MzMwOQ.GJ_z9b.a561tLNLabQeEW9v7jkXtWaMfgxMezr5OOehiw"
 
 # The ID of your Discord server (guild)
 guild-id: "1492372179508264971"
@@ -35,12 +35,14 @@ ignored-roles:
 # If a player has multiple roles, the FIRST match in this list is used
 role-priority:
   - "Owner"
+  - "Mod"
   - "OG"
 
 # Role colours in Minecraft chat (using & colour codes)
 # If a role is not listed here it will use the default colour
 role-colours:
   "Owner": "&6"
+  "Mod": "&c"
   "OG": "&d"
 
 # Default colour for roles not listed in role-colours above
